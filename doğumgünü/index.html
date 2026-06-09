@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>İyi Ki Doğdun Sevgilim!</title>
+    <style>
+        /* Sayfa Genel Tasarımı */
+        body {
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #ffe5ec, #ffb3c6);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #4a4a4a;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px 20px;
+            overflow-x: hidden;
+            position: relative;
+            transition: background 0.8s ease, color 0.8s ease;
+        }
+
+        /* Gece Modu Stilleri */
+        body.night-mode {
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            color: #e0e0e0;
+        }
+        body.night-mode .card, 
+        body.night-mode .quiz-container, 
+        body.night-mode .album-container,
+        body.night-mode .coupon-container,
+        body.night-mode .fortune-container {
+            background: #0f172a;
+            border-color: #475569;
+            color: #e2e8f0;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        body.night-mode .photo-frame {
+            background: #1e293b;
+            border-color: #334155;
+        }
+        body.night-mode p, body.night-mode .question-text {
+            color: #cbd5e1;
+        }
+        body.night-mode .option-btn {
+            background: #1e293b;
+            border-color: #334155;
+            color: #cbd5e1;
+        }
+        body.night-mode .option-btn:hover {
+            background: #334155;
+            color: #ff477e;
+        }
+
+        /* Tema Değiştirme Butonu */
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: white;
+            border: 2px solid #ff477e;
+            padding: 10px;
+            border-radius: 50%;
+            cursor: pointer;
+            z-index: 1002;
+            font-size: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+        .theme-toggle:hover { transform: scale(1.1); }
+
+        /* Düşen Kalpler */
+        .falling-heart {
+            position: fixed;
+            top: -10px;
+            font-size: 20px;
+            color: rgba(255, 71, 126, 0.6);
+            pointer-events: none;
+            z-index: 999;
+            animation: fall linear forwards;
+        }
+        @keyframes fall { to { transform: translateY(105vh) translateX(30px); opacity: 0; } }
+
+        /* Tıklayınca Uçan Balonlar */
+        .click-balloon {
+            position: fixed;
+            pointer-events: none;
+            z-index: 1000;
+            font-size: 30px;
+            animation: flyUp 2s ease-out forwards;
+        }
+        @keyframes flyUp {
+            0% { transform: translate(-50%, -50%) scale(0.5); opacity: 1; }
+            100% { transform: translate(-50%, -150vh) translateX(50px) scale(1.2); opacity: 0; }
+        }
+
+        /* Konfeti Efekti */
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            top: -10px;
+            z-index: 999;
+            animation: confettiFall 3s linear forwards;
+        }
+        @keyframes confettiFall {
+            0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+        }
+
+        /* Gelişmiş Müzik Kutusu */
+        .music-box {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            padding: 12px 20px;
+            border-radius: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border: 2px solid #ff477e;
+            z-index: 1001;
+            font-weight: bold;
+            color: #ff477e;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            width: 180px;
+            box-sizing: border-box;
+        }
+        body.night-mode .music-box { background: #0f172a; border-color: #475569; }
+        .music-controls { display: flex; align-items: center; gap: 10px; cursor: pointer; width: 100%; justify-content: center; }
+        .progress-container { width: 100%; display: flex; align-items: center; gap: 5px; font-size: 11px; color: #666; }
+        body.night-mode .progress-container { color: #94a3b8; }
+        .progress-bar { flex: 1; -webkit-appearance: none; appearance: none; height: 5px; border-radius: 5px; background: #ffe5ec; outline: none; cursor: pointer; }
+        body.night-mode .progress-bar { background: #334155; }
+        .progress-bar::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 12px; height: 12px; border-radius: 50%; background: #ff477e; cursor: pointer; }
+
+        /* Kart Yapıları */
+        .card, .quiz-container, .album-container, .coupon-container, .fortune-container {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+            max-width: 550px;
+            width: 100%;
+            border: 2px solid #ff85a2;
+            text-align: center;
+            margin-bottom: 40px;
+            box-sizing: border-box;
+            z-index: 10;
+        }
+
+        .heart { font-size: 50px; color: #ff477e; animation: beat 1.2s infinite; margin-bottom: 20px; }
+        @keyframes beat { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.2); } }
+
+        h1 { font-size: 2.3rem; margin-bottom: 10px; color: #ff477e; }
+        h2 { color: #ff477e; font-size: 1.8rem; margin-bottom: 20px; }
+        p { font-size: 1.1rem; line-height: 1.7; margin-bottom: 20px; }
+
+        /* Sayaç Alanı */
+        .counter-box { background: #ffe5ec; padding: 15px; border-radius: 15px; margin-top: 25px; border: 1px dashed #ff477e; }
+        body.night-mode .counter-box { background: #1e293b; border-color: #475569; }
+        .counter-title { font-weight: bold; color: #ff477e; margin-bottom: 5px; font-size: 1.1rem; }
+        #timer { font-size: 1.2rem; font-weight: 700; color: #4a4a4a; }
+        body.night-mode #timer { color: #cbd5e1; }
+
+        /* Butonlar */
+        .mektup-btn, .fortune-btn {
+            background-color: #ff477e; color: white; border: none; padding: 12px 25px; font-size: 1.05rem;
+            font-weight: bold; border-radius: 25px; cursor: pointer; margin-top: 20px;
+            box-shadow: 0 5px 15px rgba(255, 71, 126, 0.3); transition: all 0.3s ease;
+        }
+        .mektup-btn:hover, .fortune-btn:hover { background-color: #ff758f; transform: translateY(-2px); box-shadow: 0 8px 20px rgba(255, 71, 126, 0.5); }
+
+        /* Gizli Mektup */
+        .gizli-mektup { max-height: 0; overflow: hidden; opacity: 0; transition: all 0.6s ease-in-out; background: #fff5f7; border-radius: 15px; padding: 0 20px; margin-top: 0; border: 0 solid #ffb3c6; text-align: left; }
+        body.night-mode .gizli-mektup { background: #1e293b; }
+        .gizli-mektup.acik { max-height: 1000px; opacity: 1; padding: 20px; margin-top: 20px; border: 1px solid #ffb3c6; }
+        body.night-mode .gizli-mektup.acik { border-color: #475569; }
+        .mektup-baslik { font-weight: bold; color: #ff477e; margin-bottom: 15px; font-size: 1.2rem; text-align: center; }
+        .mektup-icerik { font-size: 1rem; text-align: justify; margin-bottom: 0; line-height: 1.6; color: #555; }
+        body.night-mode .mektup-icerik { color: #cbd5e1; }
+
+        /* Aşk Testi Tasarımı */
+        .quiz-title { font-size: 1.6rem; color: #ff477e; margin-bottom: 10px; font-weight: bold; }
+        .quiz-subtitle { font-size: 0.95rem; color: #666; margin-bottom: 25px; font-style: italic; }
+        body.night-mode .quiz-subtitle { color: #94a3b8; }
+        .question-box { display: none; }
+        .question-box.active { display: block; }
+        .question-text { font-size: 1.2rem; font-weight: 600; margin-bottom: 20px; color: #4a4a4a; }
+        .options-list { display: flex; flex-direction: column; gap: 12px; }
+        .option-btn { background: #fdfdfd; border: 2px solid #ffe5ec; padding: 14px 20px; border-radius: 12px; cursor: pointer; font-size: 1rem; font-weight: 600; color: #555; transition: all 0.2s ease; text-align: center; }
+        .option-btn:hover { background: #ffe5ec; border-color: #ff85a2; color: #ff477e; }
+        .quiz-feedback { margin-top: 15px; font-weight: bold; font-size: 1.05rem; min-height: 24px; }
+        
+        /* Fotoğraf Çerçeveleri */
+        .photo-frame { background: #fdfdfd; padding: 15px; margin-bottom: 35px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); border: 1px solid #eee; transform: rotate(-1.5deg); transition: transform 0.3s ease; }
+        .photo-frame:nth-child(even) { transform: rotate(2deg); }
+        .photo-frame:hover { transform: rotate(0deg) scale(1.03); box-shadow: 0 8px 20px rgba(0,0,0,0.15); }
+        .photo-frame img { width: 100%; height: auto; border-radius: 4px; display: block; }
+        .photo-story { font-style: normal; font-size: 1.4rem; font-weight: 700; color: #ff477e; margin-top: 15px; text-align: center; line-height: 1.2; }
+        .photo-substory { font-style: italic; font-size: 0.95rem; color: #666; margin-top: 8px; text-align: center; line-height: 1.4; }
+        body.night-mode .photo-substory { color: #94a3b8; }
+        .belali-not { font-size: 1.1rem; color: #ff477e; font-weight: 600; }
+
+        /* Sanal Pasta Alanı */
+        .cake-area { margin-top: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .cake { font-size: 70px; cursor: pointer; transition: transform 0.3s; position: relative; user-select: none; }
+        .cake:hover { transform: scale(1.1); }
+        .candle-flame { position: absolute; top: -5px; left: 50%; transform: translateX(-50%); font-size: 25px; animation: flicker 0.5s infinite alternate; transition: opacity 0.5s; }
+        @keyframes flicker { 0% { transform: translateX(-50%) scale(1); } 100% { transform: translateX(-50%) scale(1.1); } }
+        .cake-result { font-size: 1.3rem; font-weight: bold; color: #ff477e; margin-top: 15px; min-height: 30px; }
+
+        /* Kupon Tasarımları */
+        .coupons-grid { display: grid; grid-template-columns: 1fr; gap: 15px; margin-top: 20px; }
+        .coupon-card { background: #fff0f3; border: 2px dashed #ff477e; padding: 15px; border-radius: 12px; text-align: center; position: relative; box-shadow: 0 4px 6px rgba(0,0,0,0.02); }
+        body.night-mode .coupon-card { background: #1e293b; border-color: #475569; }
+        .coupon-title { font-weight: bold; color: #ff477e; font-size: 1.1rem; margin-bottom: 5px; }
+        .coupon-desc { font-size: 0.9rem; color: #555; }
+        body.night-mode .coupon-desc { color: #cbd5e1; }
+        .coupon-note { font-size: 0.75rem; color: #999; margin-top: 8px; font-style: italic; }
+
+        /* Zaman Kapsülü */
+        .capsule-box { background: #f8fafc; border: 1px solid #e2e8f0; padding: 20px; border-radius: 15px; margin-top: 20px; cursor: pointer; transition: all 0.3s; }
+        body.night-mode .capsule-box { background: #1e293b; border-color: #334155; }
+        .capsule-box:hover { border-color: #ff477e; background: #fff5f7; }
+        body.night-mode .capsule-box:hover { background: #334155; }
+        .capsule-content { max-height: 0; overflow: hidden; opacity: 0; transition: all 0.5s ease; font-size: 1rem; color: #555; text-align: justify; margin-top: 0; line-height: 1.5; }
+        body.night-mode .capsule-content { color: #cbd5e1; }
+        .capsule-content.acik { max-height: 200px; opacity: 1; margin-top: 15px; }
+
+        /* Motivasyon / Aşk Falı Kutusu */
+        .fortune-box { background: #fff5f7; border: 2px dashed #ff85a2; padding: 20px; border-radius: 15px; margin-top: 20px; min-height: 60px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; font-weight: 600; color: #4a4a4a; line-height: 1.5; }
+        body.night-mode .fortune-box { background: #1e293b; border-color: #475569; color: #cbd5e1; }
+    </style>
+</head>
+<body>
+
+    <audio id="bg-music" src="sarki.mp3" loop></audio>
+
+    <!-- GECE MODU BUTONU -->
+    <button class="theme-toggle" onclick="toggleTheme()" title="Mod Değiştir">🌙</button>
+
+    <!-- MÜZİK OYNATICI -->
+    <div class="music-box">
+        <div class="music-controls" onclick="toggleMusic()">
+            <span id="music-icon">🎵</span> <span id="music-text">Şarkımızı Aç</span>
+        </div>
+        <div class="progress-container">
+            <span id="current-time">0:00</span>
+            <input type="range" id="progress-bar" class="progress-bar" value="0" min="0" max="100" oninput="seekMusic(this.value)">
+            <span id="total-time">0:00</span>
+        </div>
+    </div>
+
+    <!-- 1. BÖLÜM: Kutlama Kartı, Mektup ve Sayaç -->
+    <div class="card">
+        <div class="heart">❤️</div>
+        <h1>İyi Ki Doğdun Sevgilim!</h1>
+        <p>
+            Hayatımın en güzel detayına, yanımda olduğun her güne şükrettiğim insana... 
+            Yeni yaşın sana senin gibi sonsuz güzellikler, mutluluklar og huzur getirsin. 
+        </p>
+        <p>
+            Gözlerinin içindeki o ışık hiç sönmesin. İyi ki doğdun, iyi ki benim oldun. 
+            Seni çok ama çok seviyorum!
+        </p>
+
+        <div class="counter-box">
+            <div class="counter-title">İyi ki hayatımdasın... Tam</div>
+            <div id="timer">Yükleniyor...</div>
+        </div>
+
+        <button class="mektup-btn" onclick="mektupAc()">Sana Bir Mesajım Var ✨</button>
+
+        <div id="mektup" class="gizli-mektup">
+            <div class="mektup-baslik">Sol Yanıma Mektup... 💌</div>
+            <div class="mektup-icerik">
+                Hayatımın en güzel, en parlak ve en huzurlu detayına, sol yanıma...<br><br>
+                Bugün senin doğum günün ve ben bu satırları yazarken, hayatımın seninle kesiştiği o ilk anı, o ilk günü düşünüyorum. Zaman o kadar hızlı ve o kadar güzel akıyor ki seninle... Sayacın üzerindeki o saniyeler sadece geçen zamanı değil; seninle biriktirdiğimiz her bir kahkahayı, her bir güzel bakışı, aştığımız her zorluğu ve birbirimize kattığımız o sonsuz sevgiyi gösteriyor aslında. Sen benim bu hayatta başıma gelen en güzel, en kusursuz şeysin.<br><br>
+                Sadece sevgilim değil; en yakın arkadaşım, sırtımı yasladığımda tüm dünyayı unutabildiğim tek limanım oldun. Gözlerinin içine her baktığımda, 'iyi ki' kelimesinin dünyadaki en gerçek karşılığını görüyorum. Kusurlarıyla, doğrularıyla, tüm o tatlı inatlaşmalarımızla ve bitmek bilmeyen enerjinle sen benim dünyamı güzelleştiren tek insansın. Evet, kabul ediyorum; sayfadaki o son fotoğrafta da dediğim gibi, ben senin her daim başının en tatlı belasıyım ve bundan vazgeçecek hiç niyetim yok! Ömrümün sonuna kadar, her sabah uyandığında, her başın sıkıştığında ya da en çok eğlendiğin o anda tam yanında, kalbinin en derininde olmaya devam edeceğim.<br><br>
+                Yeni yaşın sana senin o tertemiz kalbin gibi güzellikler, huzur, neşe ve her şeyden önemlisi hep birlikte geçireceğimiz upuzun, musmutlu yıllar getirsin. Ellerimiz hiç ayrılmasın, o güzel yüzün benim yüzümden hep gülsün sevgilim.<br><br>
+                İyi ki doğdun, iyi ki benim oldun, iyi ki hayatımdasın. Seni kelimelerin anlatabileceğinden çok daha fazla, her gün büyüyen bir aşkla seviyorum. Doğum günün kutlu olsun bebeğim...
+            </div>
+        </div>
+    </div>
+
+    <!-- NEW: KOCA AYI'DAN GÜNÜN MESAJI KUTUSU -->
+    <div class="fortune-container">
+        <h2>Koca Ayı'dan Günün Mesajı 🔮</h2>
+        <p style="font-size: 0.95rem;">Bugün Koca Ayı'nın kalbinden senin için ne geçiyor? Öğrenmek için butona tıkla sevgilim!</p>
+        <button class="fortune-btn" onclick="getFortune()">Mesajımı Seç ✨</button>
+        <div id="fortune-display" class="fortune-box">Henüz bir mesaj seçilmedi. Butona bas ve ilk sürprizini gör! 🥰</div>
+    </div>
+
+    <!-- 2. BÖLÜM: Albüm Alanı -->
+    <div class="album-container">
+        <h2>Bizim Hikayemiz 📸</h2>
+
+        <div class="photo-frame">
+            <img src="foto1.jpeg" alt="Anı 1">
+            <div class="photo-story">Sen</div>
+            <div class="photo-substory">Hayatımın tam merkezine yerleşen, baktığım her yerde gördüğüm o benzersiz mucize.</div>
+        </div>
+
+        <div class="photo-frame">
+            <img src="foto2.jpeg" alt="Anı 2">
+            <div class="photo-story">Ben</div>
+            <div class="photo-substory">Senin yanında kim olduğumu hatırlayan, seninle yeniden doğan o şanslı adam.</div>
+        </div>
+
+        <div class="photo-frame">
+            <img src="foto3.jpeg" alt="Anı 3">
+            <div class="photo-story">Gözlerinin İçine</div>
+            <div class="photo-substory">Dünyanın en güzel manzarası... İçinde kaybolmaktan asla yorulmayacağım tek yer.</div>
+        </div>
+
+        <div class="photo-frame">
+            <img src="foto4.jpeg" alt="Anı 4">
+            <div class="photo-story">Ellerini</div>
+            <div class="photo-substory">Sıkıca tuttuğumda tüm dünyayı karşıma alabileceğimi hissettiren en güvenli limanım.</div>
+        </div>
+
+        <div class="photo-frame">
+            <img src="foto5.jpeg" alt="Anı 5">
+            <div class="photo-story">Kalbin</div>
+            <div class="photo-substory">İçinde bana da bir yer ayırdığın için her gün şükrettiğim o kocaman, tertemiz dünya.</div>
+        </div>
+
+        <div class="photo-frame">
+            <img src="foto6.jpeg" alt="Anı 6">
+            <div class="photo-story">Ve biz</div>
+            <div class="photo-substory">Yan yana geldiğimizde tüm eksik parçaları tamamlanan o kusursuz resim.</div>
+        </div>
+
+        <div class="photo-frame">
+            <img src="foto7.jpeg" alt="Anı 7">
+            <div class="photo-story">Birlikte</div>
+            <div class="photo-substory">Aştığımız her yokuşta, güldüğümüz her saçma anda, iyi ki dediğimiz her saniyede...</div>
+        </div>
+
+        <div class="photo-frame">
+            <img src="foto8.jpeg" alt="Anı 8">
+            <div class="photo-story">Güzeliz</div>
+            <div class="photo-substory">Çünkü aşk, en çok seninle benim yan yana duruşuma yakışıyor sevgilim.</div>
+        </div>
+
+        <div class="photo-frame">
+            <img src="foto9.jpeg" alt="Anı 9">
+            <div class="photo-story">Bu yılda</div>
+            <div class="photo-substory">Yenilenen takvimlerin, değişen rakamların ötesinde, bendeki yerinin hiç değişmeyeceği yeni bir dönemde...</div>
+        </div>
+
+        <div class="photo-frame">
+            <img src="foto10.jpeg" alt="Anı 10">
+            <div class="photo-story">Mutlu Sakin Ve Birlikte Geçsin Sevgilim..</div>
+            <div class="photo-substory">Gürültüden uzak, sadece senin sesinle huzur bulduğum, ellerimizin hiç ayrılmadığı upuzun yıllara.</div>
+        </div>
+
+        <div class="photo-frame">
+            <img src="foto11.jpeg" alt="Anı 11">
+            <div class="photo-story belali-not">(buraya biraz kendimi sıkıştırdımm her daim başının belasıyım bebeğimm &lt;3)</div>
+            <div class="photo-substory">Kaçışın yok sevgilim, en tatlı belan olarak ömrünün sonuna kadar tam buradayımm!</div>
+        </div>
+    </div>
+
+    <!-- 3. BÖLÜM: AŞK TESTİ (QUIZ) & DOĞUM GÜNÜ PASTASI -->
+    <div class="quiz-container">
+        <div class="quiz-title">Maşa Koca Ayıyı Ne Kadar Seviyo? 🤔</div>
+        <div class="quiz-subtitle">Koca Ayı'yı ne kadar iyi tanıdığını test etme vakti sevgilim!</div>
+
+        <!-- Soru 1 -->
+        <div id="q1" class="question-box active">
+            <div class="question-text">1. İlk kim açıldı?</div>
+            <div class="options-list">
+                <button class="option-btn" onclick="checkAnswer(1, true, 'q1', 'q2')">Ceyloş</button>
+                <button class="option-btn" onclick="checkAnswer(1, false, 'q1', 'q2')">Emroş</button>
+            </div>
+        </div>
+
+        <!-- Soru 2 -->
+        <div id="q2" class="question-box">
+            <div class="question-text">2. Kim kimi daha çok seviyo?</div>
+            <div class="options-list">
+                <button class="option-btn" onclick="checkAnswer(2, false, 'q2', 'q3')">Ceyloş</button>
+                <button class="option-btn" onclick="checkAnswer(2, true, 'q2', 'q3')">Emroş</button>
+            </div>
+        </div>
+
+        <!-- Soru 3 -->
+        <div id="q3" class="question-box">
+            <div class="question-text">3. Tartışmasız dünyanın en inatçı ama bir o kadar da sevimli olan Maşa'sının kahrını en tatlı kim çeker?</div>
+            <div class="options-list">
+                <button class="option-btn" onclick="checkAnswer(3, true, 'q3', 'finish')">Emroş</button>
+                <button class="option-btn" onclick="checkAnswer(3, false, 'q3', 'finish')">Ceyloş</button>
+            </div>
+        </div>
+
+        <!-- Bitiş Ekranı + Pasta Oyunu -->
+        <div id="q-finish" class="question-box">
+            <div class="question-text" style="color: #ff477e; font-size: 1.4rem;">Tebrikler Bebeğim! 🎉</div>
+            <p>Test bitti! Maşa'nın Koca Ayı'ya olan aşkı tescillendi. Şimdi sıra doğum günü dileğinde!</p>
+            
+            <div class="cake-area">
+                <div class="cake" onclick="blowCandle()">
+                    <span id="flame" class="candle-flame">🔥</span>
+                    🎂
+                </div>
+                <div id="cake-msg" class="cake-result">Muma tıklayarak içinden bir dilek tut ve üfle! 🌬️</div>
+            </div>
+        </div>
+
+        <div id="feedback" class="quiz-feedback"></div>
+    </div>
+
+    <!-- 4. BÖLÜM: AŞK KUPONLARI -->
+    <div class="coupon-container">
+        <h2>Koca Ayı'dan Maşa'ya Aşk Kuponları 🎫</h2>
+        <p style="font-size: 0.95rem; margin-bottom: 15px;">Canın ne zaman isterse ekran görüntüsü alıp bana göndermen yeterli sevgilim!</p>
+        <div class="coupons-grid">
+            <div class="coupon-card">
+                <div class="coupon-title">1 Adet Trip Atma Muafiyeti Kuponu</div>
+                <div class="coupon-desc">Bu kupon kullanıldığında Koca Ayı haksız olduğunu sorgusuz sualsiz kabul eder.</div>
+                <div class="coupon-note">*Son kullanma tarihi: Sonsuza kadar.</div>
+            </div>
+            <div class="coupon-card">
+                <div class="coupon-title">1 Adet Sorgusuz Sualsiz Masaj Kuponu</div>
+                <div class="coupon-desc">Yorulduğun her an, nerede olursak olalım sınırsız omuz og baş masajı hakkı!</div>
+                <div class="coupon-note">*İptal edilemez, devredilemez.</div>
+            </div>
+            <div class="coupon-card">
+                <div class="coupon-title">1 Adet Tatlı Krizini Çözme Kuponu</div>
+                <div class="coupon-desc">Saat kaç olursa olsun en sevdiğin tatlı anında kapında bitecek!</div>
+                <div class="coupon-note">*Koca Ayı kurye servis garantilidir.</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 5. BÖLÜM: GELECEĞE NOT (ZAMAN KAPSÜLÜ) -->
+    <div class="card" style="margin-bottom: 20px;">
+        <h2>Geleceğe Zaman Kapsülü ⏳</h2>
+        <div class="capsule-box" onclick="toggleCapsule()">
+            <strong style="color: #ff477e;">🔒 Bir Sonraki Doğum Gününde Açılacak Not...</strong>
+            <div id="capsule-text" class="capsule-content">
+                Sen her ne kadar merak edip bu kutuyu şimdiden açmış olsan da (kesin açacağını biliyordum tutamadın kendini değil mi?), bu satırlar sana gelecekten bir söz sevgilim: Önümüzdeki sene tam bugün, yine senin yanında, ellerini yine aynı aşkla tutuyor olacağım. Yaşlar ilerlese de içimizdeki bu çocuksu sevgi og benim sana olan hayranlığım katlanarak büyüyecek. İyi ki varsın dünyam...
+            </div>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT KODLARI -->
+    <script>
+        // 1. SABİT SAYAÇ AYARI (16 Ekim 2022 - Saat 19:43)
+        const baslangicTarihi = new Date(2022, 9, 16, 19, 43, 0); // JS'de aylar 0'dan başlar (Ekim = 9)
+
+        function updateTimer() {
+            const simdi = new Date();
+            const fark = simdi - baslangicTarihi;
+            const gun = Math.floor(fark / (1000 * 60 * 60 * 24));
+            const saat = Math.floor((fark % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const dakika = Math.floor((fark % (1000 * 60 * 60)) / (1000 * 60));
+            const saniye = Math.floor((fark % (1000 * 60)) / 1000);
+            document.getElementById('timer').innerHTML = `${gun} Gün, ${saat} Saat, ${dakika} Dakika, ${saniye} Saniye`;
+        }
+        setInterval(updateTimer, 1000); updateTimer();
+
+        // 2. KALP YAĞMURU
+        function createHeart() {
+            const heart = document.createElement('div');
+            heart.classList.add('falling-heart');
+            heart.innerHTML = '❤️';
+            heart.style.left = Math.random() * 100 + 'vw';
+            heart.style.animationDuration = Math.random() * 3 + 2 + 's';
+            heart.style.fontSize = Math.random() * 15 + 15 + 'px';
+            heart.style.opacity = Math.random() * 0.5 + 0.5;
+            document.body.appendChild(heart);
+            setTimeout(() => { heart.remove(); }, 5000);
+        }
+        setInterval(createHeart, 400);
+
+        // 3. EKRANA TIKLAYINCA BALON UÇURMA
+        document.body.addEventListener('click', function(e) {
+            if(e.target.closest('.music-box') || e.target.closest('.mektup-btn') || e.target.closest('#progress-bar') || e.target.closest('.option-btn') || e.target.closest('.cake') || e.target.closest('.capsule-box') || e.target.closest('.theme-toggle') || e.target.closest('.fortune-btn')) return;
+            const balonlar = ['🎈', '❤️', '✨', '🌸'];
+            const balloon = document.createElement('div');
+            balloon.classList.add('click-balloon');
+            balloon.innerHTML = balonlar[Math.floor(Math.random() * balonlar.length)];
+            balloon.style.left = e.clientX + 'px'; balloon.style.top = e.clientY + 'px';
+            document.body.appendChild(balloon);
+            setTimeout(() => { balloon.remove(); }, 2000);
+        });
+
+        // 4. MEKTUP KONTROLÜ
+        function mektupAc() { document.getElementById('mektup').classList.toggle('acik'); }
+
+        // 5. GECE-GÜNDÜZ MODU GEÇİŞİ
+        function toggleTheme() {
+            document.body.classList.toggle('night-mode');
+            const btn = document.querySelector('.theme-toggle');
+            if(document.body.classList.contains('night-mode')) {
+                btn.innerHTML = '☀️';
+            } else {
+                btn.innerHTML = '🌙';
+            }
+        }
+
+        // 6. ZAMAN KAPSÜLÜ KONTROLÜ
+        function toggleCapsule() { document.getElementById('capsule-text').classList.toggle('acik'); }
+
+        // 7. MUM ÜFLEME OYUNU
+        function blowCandle() {
+            const flame = document.getElementById('flame');
+            const msg = document.getElementById('cake-msg');
+            if(flame.style.opacity !== '0') {
+                flame.style.opacity = '0';
+                msg.style.color = '#2a9d8f';
+                msg.innerHTML = 'Dileğin Tutuldu ve Kabul Oldu! 🌟 Seni Çok Seviyorum Ömrüm!';
+                startConfetti();
+            }
+        }
+
+        // 8. KOCA AYI'DAN GÜNÜN MESAJI FONKSİYONU
+        const fortuneMessages = [
+            "🐻 'Bugün Maşa'nın ne kadar inatçı olduğunu unutup ona yeniden aşık olma günü.' - Koca Ayı",
+            "❤️ 'Dünyanın en güzel manzarası, senin bana bakarken gülen gözlerin sevgilim.'",
+            "🍕 'Falda büyük bir paket çıktı! Bu mesajı bana gösterdiğin an sana istediğin tatlıyı/yemeği ısmarlayacağım.'",
+            "✨ 'Sen benim bu hayattaki en doğru kararım, en huzurlu köşemsin. İyi ki doğdun bebeğim.'",
+            "🐻 'Maşa ne kadar trip atarsa atsın, Koca Ayı her zaman onun arkasında durmaya söz verdi.'",
+            "🌸 'Bugün şanslı günündesin! Koca Ayı'ya ekstra bir adet sarılma borçlandın, hemen tahsil edebilirsin.'",
+            "💌 'Seninle geçen her saniye, hayatımın en değerli anı. İyi ki benimle bu yoldasın.'",
+            "🍯 'Hayatımın balı, sol yanım... Yeni yaşın sana senin gibi tatlı anlar getirsin.'",
+            "🔒 'Bugün gökyüzündeki yıldızlar bile senin güzelliğini kıskanıyor, haberin olsun sevgilim!'",
+            "🐻 'Kombinini çok beğendim! (Hangi kombinin olduğu fark etmez, Koca Ayı her haline bayılıyor zaten.)'"
+        ];
+
+        function getFortune() {
+            const display = document.getElementById('fortune-display');
+            const randomIndex = Math.floor(Math.random() * fortuneMessages.length);
+            
+            // Tatlı bir geçiş efekti
+            display.style.opacity = 0;
+            setTimeout(() => {
+                display.innerHTML = fortuneMessages[randomIndex];
+                display.style.opacity = 1;
+                startConfetti();
+            }, 200);
+        }
+
+        // 9. KONFETİ SİSTEMİ
+        function startConfetti() {
+            for(let i=0; i<50; i++) {
+                const confetti = document.createElement('div');
+                confetti.classList.add('confetti');
+                confetti.style.left = Math.random() * 100 + 'vw';
+                confetti.style.backgroundColor = ['#ff477e','#ff758f','#ffccd5','#ffb3c6','#ff85a2'][Math.floor(Math.random()*5)];
+                confetti.style.animationDuration = Math.random() * 2 + 1 + 's';
+                confetti.style.width = Math.random() * 8 + 6 + 'px';
+                confetti.style.height = confetti.style.width;
+                document.body.appendChild(confetti);
+                setTimeout(() => { confetti.remove(); }, 3000);
+            }
+        }
+
+        // 10. QUIZ KONTROLLERİ
+        let correctCount = 0;
+        function checkAnswer(questionNum, isCorrect, currentId, nextId) {
+            const feedback = document.getElementById('feedback');
+            
+            if (isCorrect) {
+                correctCount++;
+                feedback.style.color = '#2a9d8f';
+                feedback.innerHTML = 'Doğru Cevap! Maşa Koca Ayı\'sını çok iyi tanıyor 🥰';
+                startConfetti();
+                
+                setTimeout(() => {
+                    feedback.innerHTML = '';
+                    document.getElementById(currentId).classList.remove('active');
+                    if(nextId === 'finish') {
+                        document.getElementById('q-finish').classList.add('active');
+                    } else {
+                        document.getElementById(nextId).classList.add('active');
+                    }
+                }, 1500);
+            } else {
+                feedback.style.color = '#e63946';
+                feedback.innerHTML = 'Hadi canım! Koca Ayı bunu unuttuğuna çok üzüldü... Bir daha düşün sevgilim! 🐻';
+            }
+        }
+
+        // 11. MÜZİK ALTYAPISI
+        const music = document.getElementById('bg-music');
+        const progressBar = document.getElementById('progress-bar');
+        const currentTimeText = document.getElementById('current-time');
+        const totalTimeText = document.getElementById('total-time');
+
+        function toggleMusic() {
+            const icon = document.getElementById('music-icon');
+            const text = document.getElementById('music-text');
+            if (music.paused) {
+                music.play().catch(e => console.log("Müzik engellendi."));
+                icon.innerHTML = '⏸️'; text.innerHTML = 'Şarkıyı Durdur';
+            } else {
+                music.pause();
+                icon.innerHTML = '🎵'; text.innerHTML = 'Şarkımızı Aç';
+            }
+        }
+
+        function formatTime(secs) {
+            let minutes = Math.floor(secs / 60); let seconds = Math.floor(secs % 60);
+            if (seconds < 10) seconds = "0" + seconds;
+            return minutes + ":" + seconds;
+        }
+
+        music.addEventListener('timeupdate', () => {
+            if (!isNaN(music.duration)) {
+                progressBar.value = (music.currentTime / music.duration) * 100;
+                currentTimeText.innerHTML = formatTime(music.currentTime);
+                totalTimeText.innerHTML = formatTime(music.duration);
+            }
+        });
+
+        music.addEventListener('loadedmetadata', () => { totalTimeText.innerHTML = formatTime(music.duration); });
+        function seekMusic(value) { if (!isNaN(music.duration)) { music.currentTime = (value / 100) * music.duration; } }
+    </script>
+</body>
+</html>
